@@ -1,4 +1,13 @@
-x64/
-Debug/
-Release/
-.vs/
+# Коренной файл
+*.zip
+*.tar.gz
+
+
+*.pb
+*.weights
+
+.idea/
+
+frameworks/darknet/
+frameworks/tensorflow/
+tensorflow_models/

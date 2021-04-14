@@ -73,6 +73,21 @@ void drawBox(Mat& frame, int classId, float conf, Rect box, Mat& objectMask)
 	resize(objectMask, objectMask, Size(box.width, box.height));
 	Mat mask = (objectMask > maskThreshold);
 
+
+
+	//box.width = std::min(frame.cols, box.x + box.width);
+	//box.height = std::min(frame.rows, box.y + box.height);
+
+	if (box.x + box.width > frame.cols -1 ) {
+		int delta = box.x + box.width - (frame.cols - 1) ;
+		box.width -= delta;
+	}
+
+	if (box.y + box.height > frame.rows - 1) {
+		int delta = box.y + box.height - (frame.rows - 1);
+		box.height -= delta;
+	}
+
 	std::cout << "w & h: " << box.width << " " << box.height << " x & y:" << box.x << " " << box.y << 
 		" SuM: " << box.x + box.width << " " << box.y + box.height << "\n";
 
@@ -148,13 +163,7 @@ void postprocess(Mat& frame, const vector<Mat>& outs)
 
 			// Draw bounding box, colorize and show the mask on the image
 
-			try {
-				drawBox(frame, classId, score, box, objectMask);
-			}
-			catch (cv::Exception & e) {
-				std::cout << "Exception while calling drawBox func \n";
-			}
-
+			drawBox(frame, classId, score, box, objectMask);
 		}
 	}
 
@@ -223,12 +232,7 @@ int main()
 		auto dnn_end = std::chrono::steady_clock::now();
 
 		// Extract the bounding box and mask for each of the detected objects
-		//try {
-			postprocess(frame, outs);
-		//}
-		//catch (const cv::Exception & ex) {
-		//	std::cout << "Exception while calling postprocess func \n";
-		//}
+		postprocess(frame, outs);
 
 		// Put efficiency information. The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
 		vector<double> layersTimes;
