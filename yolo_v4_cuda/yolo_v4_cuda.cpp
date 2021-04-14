@@ -1,5 +1,16 @@
-﻿// yolo_v4_cuda.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-// https://gist.github.com/YashasSamaga/e2b19a6807a13046e399f4bc3cca3a49
+﻿/* yolo_v4_cuda.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+
+	ЭТО ОСНОВНОЙ ПРОЕКТ
+
+	https://gist.github.com/YashasSamaga/e2b19a6807a13046e399f4bc3cca3a49
+*/
+
+#define IMX_477_FULLHD "nvarguscamerasrc exposuretimerange=\"300000 300000\" exposurecompensation=0   gainrange=\"16 16\" ! "\
+"video/x-raw(memory:NVMM), "\
+"width=1920,height=1080,framerate=60/1 ! "\
+"nvvidconv flip-method=2 ! "\
+"videoconvert ! "\
+"video/x-raw, format=(string)BGR ! appsink"
 
 #include <iostream>
 
@@ -10,6 +21,7 @@
 #include <fstream>
 #include <iomanip>
 #include <chrono>
+#include <string>
 
 #include <opencv2/core.hpp>
 #include <opencv2/dnn.hpp>
@@ -18,9 +30,79 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
-constexpr float CONFIDENCE_THRESHOLD = 0;
-constexpr float NMS_THRESHOLD = 0.4;
-constexpr int NUM_CLASSES = 80;
+/*
+	0. Original COCO Dataset (80 classes)
+	1. Waiter (1 class)
+	2. Docking (3 classes)
+*/
+
+#define CHOSEN_NET  2
+
+int yolo_num_classes[] = { 80,  1,  3 };
+
+#if defined(_MSC_VER) || defined(WIN32)  || defined(_WIN32) || defined(__WIN32__) \
+|| defined(WIN64)    || defined(_WIN64) || defined(__WIN64__) 
+
+/*
+	Пути к файлу с метками классов
+*/
+std::string yolo_classes_names[] = {
+	"E:/University/12sem/object_detection_classes_yolov3.txt", 
+	"D:/ML/yolo_v4/waiter/data/classes.names", 
+	"D:/ML/yolo_v4/docking_station/data/classes.names"
+};
+
+#else
+
+std::string yolo_classes_names[] = {
+	"E:/University/12sem/object_detection_classes_yolov3.txt", 
+	"/home/eugene/studying-dnn/yolo_v4/waiter/data/classes.names", 
+	"/home/eugene/studying-dnn/yolo_v4/docking_station/data/classes.names"
+};
+
+#endif
+
+/*
+	Пути к весам
+*/
+#if defined(_MSC_VER) || defined(WIN32)  || defined(_WIN32) || defined(__WIN32__) \
+|| defined(WIN64)    || defined(_WIN64) || defined(__WIN64__) 
+std::string yolo_weights[] = { 
+	"E:/University/12sem/yolov4.weights", 
+	"D:/ML/yolo_v4/waiter/backup/yolov4_custom_train_best.weights",
+	"D:/ML/yolo_v4/docking_station/backup/yolov4_custom_train_best.weights"
+};
+
+#else
+std::string yolo_weights[] = {
+	"E:/University/12sem/yolov4.weights",
+	"/home/eugene/studying-dnn/yolo_v4/waiter/backup/yolov4_custom_train_best.weights",
+	"/home/eugene/studying-dnn/yolo_v4/docking_station/backup/yolov4_custom_train_best.weights"
+};
+#endif
+
+/*
+	Конфиг файлы
+*/
+#if defined(_MSC_VER) || defined(WIN32)  || defined(_WIN32) || defined(__WIN32__) \
+|| defined(WIN64)    || defined(_WIN64) || defined(__WIN64__) 
+std::string yolo_cfgs[] = {
+	"E:/University/12sem/yolov4.cfg", 
+	"D:/ML/yolo_v4/waiter/cfg/yolov4_custom_test.cfg", 
+	"D:/ML/yolo_v4/docking_station/cfg/yolov4_custom_test.cfg"
+};
+#else
+std::string yolo_cfgs[] = {
+	"E:/University/12sem/yolov4.cfg",
+	"/home/eugene/studying-dnn/yolo_v4/waiter/cfg/yolov4_custom_test.cfg",
+	"/home/eugene/studying-dnn/yolo_v4/docking_station/cfg/yolov4_custom_test.cfg"
+};
+#endif
+
+
+constexpr float CONFIDENCE_THRESHOLD = 0.5;
+constexpr float NMS_THRESHOLD = 0.1;
+constexpr int NUM_CLASSES = 3;
 
 // colors for bounding boxes
 const cv::Scalar colors[] = {
@@ -36,10 +118,11 @@ int main()
 	std::vector<std::string> class_names;
 	{
 		//std::ifstream class_file("E:/University/12sem/object_detection_classes_coco.txt");
-		std::ifstream class_file("E:/University/12sem/object_detection_classes_yolov3.txt");
+		//std::ifstream class_file("E:/University/12sem/object_detection_classes_yolov3.txt");
+		std::ifstream class_file(yolo_classes_names[CHOSEN_NET]);
 		if (!class_file)
 		{
-			std::cerr << "failed to open classes.txt\n";
+			std::cerr << "failed to open "<< yolo_classes_names[CHOSEN_NET] << "\n";
 			return 0;
 		}
 
@@ -48,11 +131,25 @@ int main()
 			class_names.push_back(line);
 	}
 
-	//cv::VideoCapture source("demo.mp4");
-	cv::VideoCapture source(0);
+	bool _debug_on_video = false;
+	cv::VideoCapture source;
 
-	//auto net = cv::dnn::readNetFromDarknet("E:/University/12sem/yolov4.cfg", "E:/University/12sem/yolov4.weights");
-	auto net = cv::dnn::readNetFromDarknet("E:/University/12sem/yolov4.cfg", "E:/University/12sem/yolov4.weights");
+#if defined(_MSC_VER) || defined(WIN32)  || defined(_WIN32) || defined(__WIN32__) \
+|| defined(WIN64)    || defined(_WIN64) || defined(__WIN64__) 
+
+	if (_debug_on_video) {
+		source.open("demo.mp4");
+	}
+	else {
+		source.open(0);
+		//cap.set(CAP_PROP_FRAME_WIDTH, 1280);
+		//cap.set(CAP_PROP_FRAME_HEIGHT, 720);
+	}
+#else
+	source.open(IMX_477_FULLHD);
+#endif
+
+	auto net = cv::dnn::readNetFromDarknet(yolo_cfgs[CHOSEN_NET], yolo_weights[CHOSEN_NET]);
 	net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
 	net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 	 //net.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);
@@ -72,6 +169,7 @@ int main()
 
 		auto total_start = std::chrono::steady_clock::now();
 		cv::dnn::blobFromImage(frame, blob, 0.00392, cv::Size(640, 480), cv::Scalar(), true, false, CV_32F);
+		//cv::dnn::blobFromImage(frame, blob, 0.00392, cv::Size(480, 360), cv::Scalar(), true, true, CV_32F);
 		net.setInput(blob);
 
 		auto dnn_start = std::chrono::steady_clock::now();
@@ -144,6 +242,11 @@ int main()
 		cv::putText(frame, stats.c_str(), cv::Point(0, stats_bg_sz.height + 5), cv::FONT_HERSHEY_COMPLEX_SMALL, 1, cv::Scalar(255, 255, 255));
 
 		cv::namedWindow("output");
+
+		if (frame.cols >= 720) {
+			cv::resize(frame, frame, cv::Size(), 0.5, 0.5, cv::INTER_LINEAR);
+		}
+
 		cv::imshow("output", frame);
 	}
 
