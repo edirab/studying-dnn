@@ -6,11 +6,11 @@
 - Описание параметров [cfg-файла по ссылке](https://github.com/AlexeyAB/darknet/wiki/CFG-Parameters-in-the-%5Bnet%5D-section)
 - Запуск обучения `!./darknet detector train data/yolov4.data cfg/yolov4_custom_train.cfg yolov4.conv.137 -dont_show -map`
 
-![](../imgs/Result.png)
+![](../../imgs/Result.png)
 
-![](../imgs/Dock.png)
+![](../../imgs/Dock.png)
 
-![](../imgs/Chart_loss_dock.png)
+![](../../imgs/Chart_loss_dock.png)
 ### Изменения в оригинальном Colab
 
 - В `yolov4_config.py`:

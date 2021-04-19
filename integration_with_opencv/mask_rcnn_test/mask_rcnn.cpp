@@ -175,13 +175,13 @@ int main()
 {
 
 	// Load names of classes
-	string classesFile = "D:/ML/mask_rcnn/mask-rcnn-coco/object_detection_classes_coco.txt";
+	string classesFile = "D:/studying-dnn/neural-nets/mask_rcnn/mask-rcnn-coco/object_detection_classes_coco.txt";
 	ifstream ifs(classesFile.c_str());
 	string line;
 	while (getline(ifs, line)) classes.push_back(line);
 
 	// Load the colors
-	string colorsFile = "D:/ML/mask_rcnn/mask-rcnn-coco/colors.txt";
+	string colorsFile = "D:/studying-dnn/neural-nets/mask_rcnn/mask-rcnn-coco/colors.txt";
 	ifstream colorFptr(colorsFile.c_str());
 	while (getline(colorFptr, line)) {
 		char* pEnd;
@@ -196,8 +196,8 @@ int main()
 	cv::VideoCapture source(0);
 
 	//auto net = cv::dnn::readNetFromDarknet("E:/University/12sem/yolov4.cfg", "E:/University/12sem/yolov4.weights");
-	auto net = cv::dnn::readNetFromTensorflow("D:/ML/mask_rcnn/mask-rcnn-coco/frozen_inference_graph.pb", 
-												"D:/ML/mask_rcnn/mask-rcnn-coco/mask_rcnn_inception_v2_coco_2018_01_28.pbtxt");
+	auto net = cv::dnn::readNetFromTensorflow("D:/studying-dnn/neural-nets/mask_rcnn/mask-rcnn-coco/frozen_inference_graph.pb", 
+												"D:/studying-dnn/neural-nets/mask_rcnn/mask-rcnn-coco/mask_rcnn_inception_v2_coco_2018_01_28.pbtxt");
 	net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
 	net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 	 //net.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);

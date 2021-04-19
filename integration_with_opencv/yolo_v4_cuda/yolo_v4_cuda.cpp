@@ -48,16 +48,16 @@ int yolo_num_classes[] = { 80,  1,  3 };
 */
 std::string yolo_classes_names[] = {
 	"E:/University/12sem/object_detection_classes_yolov3.txt", 
-	"D:/ML/yolo_v4/waiter/data/classes.names", 
-	"D:/ML/yolo_v4/docking_station/data/classes.names"
+	"D:/studying-dnn/neural-nets/yolo_v4/waiter/data/classes.names", 
+	"D:/studying-dnn/neural-nets/yolo_v4/docking_station/data/classes.names"
 };
 
 #else
 
 std::string yolo_classes_names[] = {
 	"E:/University/12sem/object_detection_classes_yolov3.txt", 
-	"/home/eugene/studying-dnn/yolo_v4/waiter/data/classes.names", 
-	"/home/eugene/studying-dnn/yolo_v4/docking_station/data/classes.names"
+	"/home/eugene/studying-dnn/neural-nets/yolo_v4/waiter/data/classes.names", 
+	"/home/eugene/studying-dnn/neural-nets/yolo_v4/docking_station/data/classes.names"
 };
 
 #endif
@@ -69,15 +69,15 @@ std::string yolo_classes_names[] = {
 || defined(WIN64)    || defined(_WIN64) || defined(__WIN64__) 
 std::string yolo_weights[] = { 
 	"E:/University/12sem/yolov4.weights", 
-	"D:/ML/yolo_v4/waiter/backup/yolov4_custom_train_best.weights",
-	"D:/ML/yolo_v4/docking_station/backup/yolov4_custom_train_best.weights"
+	"D:/studying-dnn/neural-nets/yolo_v4/waiter/backup/yolov4_custom_train_best.weights",
+	"D:/studying-dnn/neural-nets/yolo_v4/docking_station/backup/yolov4_custom_train_best.weights"
 };
 
 #else
 std::string yolo_weights[] = {
 	"E:/University/12sem/yolov4.weights",
-	"/home/eugene/studying-dnn/yolo_v4/waiter/backup/yolov4_custom_train_best.weights",
-	"/home/eugene/studying-dnn/yolo_v4/docking_station/backup/yolov4_custom_train_best.weights"
+	"/home/eugene/studying-dnn/neural-nets/yolo_v4/waiter/backup/yolov4_custom_train_best.weights",
+	"/home/eugene/studying-dnn/neural-nets/yolo_v4/docking_station/backup/yolov4_custom_train_best.weights"
 };
 #endif
 
@@ -88,14 +88,14 @@ std::string yolo_weights[] = {
 || defined(WIN64)    || defined(_WIN64) || defined(__WIN64__) 
 std::string yolo_cfgs[] = {
 	"E:/University/12sem/yolov4.cfg", 
-	"D:/ML/yolo_v4/waiter/cfg/yolov4_custom_test.cfg", 
-	"D:/ML/yolo_v4/docking_station/cfg/yolov4_custom_test.cfg"
+	"D:/studying-dnn/neural-nets/yolo_v4/waiter/cfg/yolov4_custom_test.cfg", 
+	"D:/studying-dnn/neural-nets/yolo_v4/docking_station/cfg/yolov4_custom_test.cfg"
 };
 #else
 std::string yolo_cfgs[] = {
 	"E:/University/12sem/yolov4.cfg",
-	"/home/eugene/studying-dnn/yolo_v4/waiter/cfg/yolov4_custom_test.cfg",
-	"/home/eugene/studying-dnn/yolo_v4/docking_station/cfg/yolov4_custom_test.cfg"
+	"/home/eugene/studying-dnn/neural-nets/yolo_v4/waiter/cfg/yolov4_custom_test.cfg",
+	"/home/eugene/studying-dnn/neural-nets/yolo_v4/docking_station/cfg/yolov4_custom_test.cfg"
 };
 #endif
 
