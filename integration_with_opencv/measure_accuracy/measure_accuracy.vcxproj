@@ -158,7 +158,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Experiment.cpp" />
     <ClCompile Include="measure_accuracy.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Experiment.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
