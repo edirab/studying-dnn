@@ -25,6 +25,9 @@
 #define VIDEO_WITH "D:/studying-dnn/integration_with_opencv/measure_accuracy/with.mp4"
 #define VIDEO_WITHOUT "D:/studying-dnn/integration_with_opencv/measure_accuracy/without.mp4"
 
+#define VIDEO_W_CIRCLE "D:/studying-dnn/integration_with_opencv/measure_accuracy/white_circle.mp4"
+#define VIDEO_B_CIRCLE "D:/studying-dnn/integration_with_opencv/measure_accuracy/black_circle.mp4"
+
 constexpr float CONFIDENCE_THRESHOLD = 0.8;
 constexpr float NMS_THRESHOLD = 0.05;
 constexpr int NUM_CLASSES = 3;
@@ -70,6 +73,8 @@ public:
 	void Draw();
 	void Process();
 	void AnnotateStats();
+
+	void HoughValid();
 
 private:
 

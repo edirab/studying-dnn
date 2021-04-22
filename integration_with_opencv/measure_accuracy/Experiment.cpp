@@ -13,6 +13,9 @@ Experiment::Experiment() {
 }
 
 
+
+void Experiment::HoughValid() {}
+
 void Experiment::readClassNames() {
 
 	std::ifstream class_file(CLASSES);
