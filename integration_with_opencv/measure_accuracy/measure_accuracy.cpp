@@ -24,11 +24,9 @@ int frame_counter = 0;
 	0 объектов, 1 объект, 2 объекта и более
 */
 
-int marker_stats[3][3];
+#define MAX_OBJECTS 15
+int marker_stats[3][MAX_OBJECTS];
 
-int dock_counter = 0;
-int two_bcs = 0;
-int two_wcs = 0;
 
 cv::Mat frame_resized;
 
@@ -36,15 +34,15 @@ int main()
 {
 	Experiment myExp;
 
-	cv::VideoCapture source(VIDEO_B_CIRCLE);
+	cv::VideoCapture source(VIDEO_W_CIRCLE);
 	//cv::VideoCapture source(0);
 	
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	while (1)
 	{
 		source >> myExp.frame;
 		if (myExp.frame.empty())
 		{
-			cv::waitKey();
 			break;
 		}
 
@@ -84,53 +82,52 @@ int main()
 			}
 		}
 
-
+		//
 		for (int i = 0; i < NUM_CLASSES; i++) {
-		
-			// ноль объектов | ровно 1 объект | 2 и более
-			
-			if (myExp.indices[i].size() == 0) {
-				marker_stats[i][0]++;
-			}
-			else if (myExp.indices[i].size() == 1) {
-				marker_stats[i][1]++;
+			if (myExp.indices[i].size() < MAX_OBJECTS) {
+				marker_stats[i][ myExp.indices[i].size() ]++;
 			}
 			else {
-				marker_stats[i][2]++;
+				marker_stats[i][MAX_OBJECTS - 1]++;
 			}
-		}
-
-		if (myExp.indices[0].size() == 1) {
-			dock_counter++;
-		}
-		if (myExp.indices[1].size() == 2) {
-			two_wcs++;
-		}
-		if (myExp.indices[2].size() == 2) {
-			two_bcs++;
 		}
 
 
 		char c = cv::waitKey(1);
-
 		if (c == 27) {
 			break;
 		}
 
 	} // end while(1)
-
-
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
 	cout << "Total frames: " << frame_counter << "\n";
-	cout << "\tFound pairs of white circles: " << two_wcs << " " << float(two_wcs / frame_counter) << "\n";
-	cout << "\tFound pairs of black circles: " << two_bcs << " " << float(two_bcs/frame_counter) << "\n";
-	
 
-	for (int i = 0; i < 3; i++) {
-		for (int elem : marker_stats[i])
-			cout << elem << " ";
-		cout << "\n";
-	}
+	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
+
+	/*
+		Выводим индексы для красоты и наглядности
+	*/
+	cout << "objs: ";
+	for (int i = 0; i < MAX_OBJECTS; i++)
+		cout << setw(4) << i;
+	cout << "\n";
+
+	cout << "dock: ";
+	for (int elem : marker_stats[0])
+		cout << setw(4) << elem;
+	cout << "\n";
+
+	cout << "w.c.: ";
+	for (int elem : marker_stats[1])
+		cout << setw(4) << elem;
+	cout << "\n";
+
+	cout << "b.c.: ";
+	for (int elem : marker_stats[2])
+		cout << setw(4) << elem;
 
 	return 0;
 }

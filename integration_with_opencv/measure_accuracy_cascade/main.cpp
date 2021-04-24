@@ -127,25 +127,6 @@ int main()
 			marker_stats[1][MAX_OBJECTS - 1]++;
 		}
 
-		//if (markers_wc.size() == 0) {
-		//	marker_stats[1][0]++;
-		//} else if (markers_wc.size() == 1) {
-		//	marker_stats[1][1]++;
-		//}
-		//else {
-		//	marker_stats[1][2]++;
-		//}
-
-		//if (markers_bc.size() == 0) {
-		//	marker_stats[2][0]++;
-		//}
-		//else if (markers_bc.size() == 1) {
-		//	marker_stats[2][1]++;
-		//}
-		//else {
-		//	marker_stats[2][2]++;
-		//}
-
 		char c = cv::waitKey(1);
 		if (c == 27) {
 			break;
