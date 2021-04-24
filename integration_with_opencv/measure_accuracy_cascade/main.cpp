@@ -34,7 +34,8 @@ int frame_counter = 0;
 	0 объектов, 1 объект, 2 объекта и более
 */
 
-int marker_stats[3][3];
+#define MAX_OBJECTS 15
+int marker_stats[2][MAX_OBJECTS];
 
 cv::Mat frame, frame_gray, frame_resized;
 
@@ -73,7 +74,7 @@ int main()
 	}
 
 
-	cv::VideoCapture source(VIDEO_B_CIRCLE);
+	cv::VideoCapture source(VIDEO_W_CIRCLE);
 	//cv::VideoCapture source(0);
 
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -112,24 +113,38 @@ int main()
 		*/
 		cout << "Frame #" << frame_counter++ << " " << markers_bc.size() << " " << markers_wc.size() << "\n";
 
-		if (markers_wc.size() == 0) {
-			marker_stats[1][0]++;
-		} else if (markers_wc.size() == 1) {
-			marker_stats[1][1]++;
+		if (markers_wc.size() < MAX_OBJECTS) {
+			marker_stats[0][markers_wc.size()]++;
 		}
 		else {
-			marker_stats[1][2]++;
+			marker_stats[0][MAX_OBJECTS - 1]++;
 		}
 
-		if (markers_bc.size() == 0) {
-			marker_stats[2][0]++;
-		}
-		else if (markers_bc.size() == 1) {
-			marker_stats[2][1]++;
+		if (markers_bc.size() < MAX_OBJECTS) {
+			marker_stats[1][markers_bc.size()]++;
 		}
 		else {
-			marker_stats[2][2]++;
+			marker_stats[1][MAX_OBJECTS - 1]++;
 		}
+
+		//if (markers_wc.size() == 0) {
+		//	marker_stats[1][0]++;
+		//} else if (markers_wc.size() == 1) {
+		//	marker_stats[1][1]++;
+		//}
+		//else {
+		//	marker_stats[1][2]++;
+		//}
+
+		//if (markers_bc.size() == 0) {
+		//	marker_stats[2][0]++;
+		//}
+		//else if (markers_bc.size() == 1) {
+		//	marker_stats[2][1]++;
+		//}
+		//else {
+		//	marker_stats[2][2]++;
+		//}
 
 		char c = cv::waitKey(1);
 		if (c == 27) {
@@ -145,11 +160,29 @@ int main()
 	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
 	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
 
-	for (int i = 0; i < 3; i++) {
-		for (int elem : marker_stats[i])
-			cout << elem << " ";
-		cout << "\n";
-	}
+	/* 
+		Выводим индексы для красоты и наглядности
+	
+	*/
+	cout << "objs: ";
+	for (int i = 0; i < MAX_OBJECTS; i++)
+		cout << setw(4) << i;
+	cout << "\n";
+
+	cout << "w.c.: ";
+	for (int elem : marker_stats[0])
+		cout << setw(4) << elem;
+	cout << "\n";
+
+	cout << "b.c.: ";
+	for (int elem : marker_stats[1])
+		cout << setw(4) << elem;
+
+	//for (int i = 0; i < 2; i++) {
+	//	for (int elem : marker_stats[i])
+	//		cout << elem << " ";
+	//	cout << "\n";
+	//}
 
 	return 0;
 }
