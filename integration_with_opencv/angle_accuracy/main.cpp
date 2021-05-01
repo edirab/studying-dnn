@@ -12,7 +12,7 @@
 #include "opencv2/imgproc.hpp"
 
 //#define VIDEO_PATH "E:/University/10sem/nirs/haar_3_4_6/pyramid_test.mp4"
-#define VIDEO_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/85.mp4"
+#define VIDEO_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/55.mp4"
 
 using namespace std;
 using namespace cv;
@@ -21,7 +21,7 @@ int false_positive_counter = 0;
 
 int main(int argc, const char** argv) {
 
-	bool use_video = false;
+	bool use_video = true;
 	bool debug_on_image = false;
 
 	int camera_device = 0;

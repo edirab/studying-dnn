@@ -44,6 +44,9 @@ class AUV {
 	Mat cMatrix1280;
 	Mat distortion1280;
 
+	Mat cMatrixFullHD;
+	Mat distortionFullHD;
+
 	// Координаты маркеров донной станции в глобальной системе координат
 	vector<Point3d> model_points;
 

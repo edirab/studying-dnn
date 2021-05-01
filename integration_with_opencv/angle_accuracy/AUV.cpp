@@ -20,9 +20,14 @@ AUV::AUV() {
 	cMatrix640 = (Mat_<double>(3, 3) << 5.3226273868525448e+02, 0, 3.2590522394049350e+02, 0, 5.3226273868525448e+02, 2.6946997900677803e+02, 0, 0, 1);
 	cMatrix1280 = (Mat_<double>(3, 3) << 8.6155235630774325e+02, 0, 6.2961522415048103e+02 ,0, 8.6155235630774325e+02, 3.9881978167213623e+02,0, 0, 1);
 
-
 	distortion640 = (Mat_<double>(1, 5) << 0, -6.1539772782054671e-02, 0, 0, 1.7618036793466491e-02);
 	distortion1280 = (Mat_<double>(1, 5) << 0, -6.5524123635067169e-02, 0, 0, 0 );
+
+	cMatrixFullHD = (Mat_<double>(3, 3) << 1.8319233710098095e+04, 0, 9.5950000000000000e+02,
+											0, 1.8319233710098095e+04, 5.3950000000000000e+02,
+											0, 0, 1);
+
+	distortionFullHD = (Mat_<double>(1, 5) << 2.5318626977076864e+01, -1.2398369018684898e+04, 0, 0, 2.4953338626272022e+06);
 
 	// Задание координат маркеров
 	model_points.push_back(cv::Point3d(-50, 50, 0));  // left up corner
@@ -445,7 +450,7 @@ void AUV::estimatePos(Mat &frame, bool draw_perp) {
 		//estimatePoseSingleMarkers(corners, markerLen, cMatrix640, distortion640, Rvec, Tvec);
 
 		// Solve for pose
-		solvePnP(model_points, corners, cMatrix640, distortion640, this->Rvec, this->Tvec);
+		solvePnP(model_points, corners, cMatrixFullHD, distortionFullHD, this->Rvec, this->Tvec);
 		//solvePnP(model_points, corners, camera_matrix, distortion640, Rvec, Tvec);
 
 		Mat rotMat(3, 3, CV_64F);
