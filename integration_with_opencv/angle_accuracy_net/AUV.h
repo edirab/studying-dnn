@@ -8,7 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 #include <opencv2/dnn/all_layers.hpp>
-
+#include <opencv2/features2d.hpp>
 #include "opencv2/objdetect.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/cudaobjdetect.hpp"
@@ -63,6 +63,8 @@ class AUV {
 	int marker1Counter_prev = 0, marker2Counter_prev = 0;
 
 	Mat frame_gray;
+	Ptr<SimpleBlobDetector> blobDetector;
+	SimpleBlobDetector::Params blobDetector_params;
 
 	// Матрицы камеры. Получены при калибровке
 	Mat cMatrix640;

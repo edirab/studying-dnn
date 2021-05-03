@@ -6,6 +6,9 @@ AUV::AUV() {
 	m1.resize(2);
 	m2.resize(2);
 
+	
+	//this->blobDetector = SimpleBlobDetector::create(params);
+
 	this->readClassNames();
 
 	net = cv::dnn::readNetFromDarknet(CFG_FILE, WEIGHTS);
@@ -249,10 +252,19 @@ void AUV::filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_g
 
 	vector<Marker> markers_;
 	vector<Marker> hough_valid;
-	Mat roi_mat;
+	Mat roi_mat_gray;
+	Mat roi_mat_color;
 
 	sort(objects.begin(), objects.end(), compar);
 	//print_objects(objects);
+
+	if (m_type == markerType::black_circle) {
+		blobDetector_params.blobColor = 80;
+	}
+	else {
+		blobDetector_params.blobColor = 255;
+	}
+	this->blobDetector = SimpleBlobDetector::create(blobDetector_params);
 
 	if (debug) {
 		cout << "objects.size() = " << objects.size() << "\n";
@@ -269,23 +281,21 @@ void AUV::filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_g
 	for (int i = 0; i < objects.size(); i++) {
 
 		vector<Vec3f> circles;
-		roi_mat = frame_gray(objects[i]);
-		medianBlur(roi_mat, roi_mat, 5);
-
-		//Mat t = Marker::get_template_t2(roi_mat.rows, roi_mat.cols);
-		//imshow("Mat t", t);
+		roi_mat_gray = frame_gray(objects[i]);
+		roi_mat_color = currentFrame(objects[i]);
+		medianBlur(roi_mat_gray, roi_mat_gray, 5);
 
 		/*
 		Ищем все кружочки внутри одного ROI
 		*/
-		HoughCircles(roi_mat, circles, HOUGH_GRADIENT, 1,
-			frame_gray.rows / 16,  // change this value to detect circles with different distances to each other
-			100, 30, 0.25 * roi_mat.rows, 0.50 * roi_mat.rows // change the last two parameters
-			// (min_radius & max_radius) to detect larger circles
-		);
+		vector<KeyPoint> keypoints;
+		blobDetector->detect(roi_mat_gray, keypoints);
+		drawKeypoints(roi_mat_color, keypoints, roi_mat_color, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+		imshow("Key points", roi_mat_color);
+		waitKey(0);
 
 		/*
-		Если каскад указал на объект и детектор Хаффа нашёл кружочек, то скорее всего, это то что нужно
+			Если каскад указал на объект и детектор Хаффа нашёл кружочек, то скорее всего, это то что нужно
 		*/
 		if (circles.size() == 1) {
 
@@ -293,27 +303,27 @@ void AUV::filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_g
 			hough_valid.push_back(temp_m);
 		}
 		/*
-		В одном roi_mat кружочков больше одного. Что странно
+		В одном roi_mat_gray кружочков больше одного. Что странно
 		Этот блок практически ничего не делает. За всё тестовое видео сработал 4 раза
 		*/
 		else if (circles.size() > 1) {
 
 			Mat t;
 			if (m_type == markerType::black_circle) {
-				t = Marker::get_template_t1(roi_mat.rows, roi_mat.cols);
-				threshold(roi_mat, roi_mat, 200, 255, 0);
-				absdiff(roi_mat, t, roi_mat);
-				int nonZero = countNonZero(roi_mat);
+				t = Marker::get_template_t1(roi_mat_gray.rows, roi_mat_gray.cols);
+				threshold(roi_mat_gray, roi_mat_gray, 200, 255, 0);
+				absdiff(roi_mat_gray, t, roi_mat_gray);
+				int nonZero = countNonZero(roi_mat_gray);
 
 				//if (nonZero < 0.1 * frame_gray.cols) {
 				//	hough_valid.push_back(objects[i]);
 				//}
 			}
 			else {
-				t = Marker::get_template_t2(roi_mat.rows, roi_mat.cols);
-				threshold(roi_mat, roi_mat, 200, 255, 0);
-				absdiff(roi_mat, t, roi_mat);
-				int nonZero = countNonZero(roi_mat);
+				t = Marker::get_template_t2(roi_mat_gray.rows, roi_mat_gray.cols);
+				threshold(roi_mat_gray, roi_mat_gray, 200, 255, 0);
+				absdiff(roi_mat_gray, t, roi_mat_gray);
+				int nonZero = countNonZero(roi_mat_gray);
 				//if (nonZero < 0.15 * frame_gray.cols) {
 				//	hough_valid.push_back(objects[i]);
 				//}
@@ -328,22 +338,22 @@ void AUV::filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_g
 			
 
 			if (m_type == markerType::black_circle) {
-				t = Marker::get_template_t1(roi_mat.rows, roi_mat.cols);
-				threshold(roi_mat, roi_mat, 60, 255, THRESH_BINARY);
-				//imshow("roi_mat m1 thresholded", roi_mat);
+				t = Marker::get_template_t1(roi_mat_gray.rows, roi_mat_gray.cols);
+				threshold(roi_mat_gray, roi_mat_gray, 60, 255, THRESH_BINARY);
+				//imshow("roi_mat_gray m1 thresholded", roi_mat_gray);
 
-				absdiff(roi_mat, t, roi_mat);
-				int nonZero = countNonZero(roi_mat);
+				absdiff(roi_mat_gray, t, roi_mat_gray);
+				int nonZero = countNonZero(roi_mat_gray);
 				//cout << "m1 = " << setw(7) << nonZero << "\n";
 				//fout << "m1 = " << nonZero << "\n";
 			}
 			else {
-				t = Marker::get_template_t2(roi_mat.rows, roi_mat.cols);
-				threshold(roi_mat, roi_mat, 200, 255, THRESH_BINARY);
-				//imshow("roi_mat m2 thresholded", roi_mat);
+				t = Marker::get_template_t2(roi_mat_gray.rows, roi_mat_gray.cols);
+				threshold(roi_mat_gray, roi_mat_gray, 200, 255, THRESH_BINARY);
+				//imshow("roi_mat_gray m2 thresholded", roi_mat_gray);
 
-				absdiff(roi_mat, t, roi_mat);
-				int nonZero = countNonZero(roi_mat);
+				absdiff(roi_mat_gray, t, roi_mat_gray);
+				int nonZero = countNonZero(roi_mat_gray);
 				//cout << "m2 = " << setw(7) << nonZero << "\n";
 				//fout << "m2 = " << nonZero << "\n";
 			}
