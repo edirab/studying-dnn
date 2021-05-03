@@ -432,7 +432,7 @@ void AUV::estimatePos(Mat &frame, bool draw_perp) {
 		Rodrigues(this->Rvec, rotMat);
 
 		this->Euler_angles = rotationMatrixToEulerAngles(rotMat);
-		cout << setprecision(3);
+		//cout << setprecision(3);
 		//cout << "In estimatePos: " << setw(7) << Euler_angles[0] * 180 / M_PI << setw(7) << Euler_angles[1] * 180 / M_PI << setw(7) << Euler_angles[2] * 180 / M_PI << "\n";
 		//cout  << Euler_angles[1] * 180 / 3.1415926  << "\n";
 	

@@ -53,18 +53,26 @@ double Statistics::get_median_filtered() {
 double Statistics::get_average() {
 
 	this->average = 0;
-	for (double elem : values) { this->average += elem; }
-	this->average /= values.size();
+
+	if (values.size() > 0) {
+		for (double elem : values) { this->average += elem; }
+		this->average /= values.size();
+	}
 	return this->average;
 }
+
 
 double Statistics::get_average_filtered() {
 
 	this->average_filtered = 0;
-	for (double elem : values_non_negative) { average_filtered += elem; }
-	average_filtered /= values_non_negative.size();
-	return average_filtered;
+
+	if (values_non_negative.size() > 0) {
+		for (double elem : values_non_negative) { this->average_filtered += elem; }
+		this->average_filtered /= values_non_negative.size();
+	}
+	return this->average_filtered;
 }
+
 
 double Statistics::get_std_dev() {
 
@@ -103,23 +111,23 @@ double Statistics::get_std_filtered() {
 
 void Statistics::print_stats(string path) {
 
-	constexpr int w1 = 35;
+	constexpr int w1 = 28;
 	constexpr int w2 = 7;
 
-	cout << "Stats for" << path << "\n";
+	cout << "  Stats for \"" << path << "\" \n";
 	cout << std::setprecision(4);
 
-	cout << setw(w1) << "\tLen values: "          << setw(w2) << values.size() << "\n";
-	cout << setw(w1) << "\tLen values filtered: " << setw(w2) << values_non_negative.size() << "\n";
+	cout << setw(w1) << "Len values: "          << setw(w2) << values.size() << "\n";
+	cout << setw(w1) << "Len values filtered: " << setw(w2) << values_non_negative.size() << "\n";
 
-	cout << setw(w1) << "\tAverage: "           << setw(w2) << get_average() << "\n";
-	cout << setw(w1) << "\tAverage filtered: "  << setw(w2) << get_average_filtered() << "\n";
+	cout << setw(w1) << "Average: "           << setw(w2) << get_average() << "\n";
+	cout << setw(w1) << "Average filtered: "  << setw(w2) << get_average_filtered() << "\n";
 
-	cout << setw(w1) << "\tMedian: "          << setw(w2) << get_median() << "\n";
-	cout << setw(w1) << "\tMedian filtered: " << setw(w2) << get_median_filtered() << "\n";
+	cout << setw(w1) << "Median: "          << setw(w2) << get_median() << "\n";
+	cout << setw(w1) << "Median filtered: " << setw(w2) << get_median_filtered() << "\n";
 
-	cout << setw(w1) << "\tStd dev: "          << setw(w2) << get_std_dev() << "\n";
-	cout << setw(w1) << "\tStd dev filtered: " << setw(w2) << get_std_filtered() << "\n";
+	cout << setw(w1) << "Std dev: "          << setw(w2) << get_std_dev() << "\n";
+	cout << setw(w1) << "Std dev filtered: " << setw(w2) << get_std_filtered() << "\n";
 
 	return;
 }
