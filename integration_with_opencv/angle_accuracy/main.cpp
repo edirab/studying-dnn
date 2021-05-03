@@ -1,69 +1,42 @@
 ﻿// angle_accuracy : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
-
+#include <string>
+#include <vector>
 //#include "FPS.h"
 #include "Marker.h"
 #include "AUV.h"
 #include "functions.h"
-
+#include "Statistics.h"
 
 #include "opencv2/objdetect.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
 //#define VIDEO_PATH "E:/University/10sem/nirs/haar_3_4_6/pyramid_test.mp4"
-#define VIDEO_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/55.mp4"
+#define VIDEO_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/75.mp4"
 
 using namespace std;
 using namespace cv;
 
-int false_positive_counter = 0;
+Statistics myStats;
+AUV auv;
+VideoCapture capture;
+
+vector<string> videos = { "90.mp4", "85.mp4", "80.mp4", "75.mp4", "70.mp4", "65.mp4", "60.mp4", "55.mp4", "50.mp4", "45.mp4", "40.mp4", "35.mp4", "30.mp4" };
 
 int main(int argc, const char** argv) {
 
-	bool use_video = true;
-	bool debug_on_image = false;
-
-	int camera_device = 0;
-	int frameno = 0;
 	Mat frame;
+	string path = VIDEO_PATH;
+	capture.open(path);
 
-	VideoCapture capture;
-
-	/*
-		Инициализация камеры
-	*/
-	if (!use_video && !debug_on_image) {
-		capture.open(camera_device);
-	}
-	else if (!debug_on_image) {
-		capture.open(VIDEO_PATH);
-	}
-
-	if (!capture.isOpened() && !debug_on_image) {
+	if (!capture.isOpened()) {
 		cout << "--(!)Error opening video capture\n";
 		return -1;
 	}
 
-	Size S = Size((int)capture.get(CAP_PROP_FRAME_WIDTH), (int)capture.get(CAP_PROP_FRAME_HEIGHT));
-
-	//string abs_path = "E:/University/10sem/nirs/haar_3_4_6/preparing navigation/videos/pyramid_test_demo.mp4";
-	//VideoWriter video(abs_path, CV_FOURCC('M', 'J', 'P', 'G'), 30, Size(1280, 720));
-	//VideoWriter video(abs_path, CV_FOURCC('M', 'P', '4', 'V'), 30, Size(1280, 720));
-
-	if (debug_on_image) {
-		//frame = imread("E:/University/10sem/nirs/haar_3_4_6/preparing navigation/test/2.jpg");
-		frame = imread("E:/University/10sem/nirs/haar_3_4_6/comparioson/09.jpg");
-	}
-
-	AUV auv;
-
-	do {
-
-		if (!debug_on_image) {
-			capture.read(frame);
-			//frame.copyTo(frame_2);
-		}
+	while (1) {
+		capture.read(frame);
 
 		if (frame.empty()) {
 			cout << "--(!) No captured frame -- Break!\n";
@@ -71,6 +44,9 @@ int main(int argc, const char** argv) {
 		}
 
 		auv.get_orientation(frame);
+		myStats.add(auv.get_Euler_1());
+
+		cout << setprecision(3) << auv.get_Euler_1() << "\n";
 
 		resize(frame, frame, Size(), 0.5, 0.5, cv::INTER_LINEAR);
 		imshow("Orientation", frame);
@@ -78,14 +54,10 @@ int main(int argc, const char** argv) {
 		if (waitKey(1) == 27)
 			break;
 
-	} while (!debug_on_image);
-
-	if (debug_on_image)
-		waitKey(0);
-
+	}
 	capture.release();
-	//video.release();
-
 	destroyAllWindows();
+
+	myStats.print_stats(path);
 	return 0;
 }

@@ -1,4 +1,6 @@
 ﻿#pragma once
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include <Eigen/LU>
 #include <fstream>
@@ -30,9 +32,6 @@ class AUV {
 
 	CascadeClassifier marker_type_1, marker_type_2;
 
-	String marker_1_path;
-	String marker_2_path;
-
 	int marker1Counter = 0, marker2Counter = 0;
 	int marker1Counter_prev = 0, marker2Counter_prev = 0;
 
@@ -52,6 +51,8 @@ class AUV {
 
 	Mat Rvec;
 	Mat Tvec;
+
+	Vec3f Euler_angles;
 
 	float markerLen = 100; // здесь именно расстояние между нашими маркерами, а не сторона одного маркера
 
@@ -80,8 +81,23 @@ public:
 	AUV();
 	~AUV ();
 
+
+	/*
+		Calculates rotation matrix to euler angles
+		The result is the same as MATLAB except the order
+		of the euler angles ( x and z are swapped ).
+	*/
+	Vec3f rotationMatrixToEulerAngles(Mat& R);
+
+	double get_Euler_1();
+
+
 	void get_orientation(Mat& frame);
 
+	/*
+		Определяет наклон камеры по крену (ну почти)
+		в диапазоне от -90 до +90 градусов
+	*/
 	void rotate_over_normal(Mat& frame);
 	void calculate_distance(Mat& frame, bool debug);
 
@@ -90,6 +106,12 @@ public:
 
 	void filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_gray, markerType m_type, Mat AUV_sees, bool debug);
 	void arrange_markers(Mat& frame, bool debug);
+
+	/*
+		Заполняет Rvec && Tvec, вызваая solvePnP
+		Выполняет преобразование Родригеса
+		Рисует перпендикуляр (при необходимости)
+	*/
 	void estimatePos(Mat& frame, bool draw_perp);
 };
 

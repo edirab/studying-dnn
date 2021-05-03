@@ -3,9 +3,6 @@
 
 AUV::AUV() {
 
-	marker_1_path = CASCADE_BLACK_CIRCLE;
-	marker_2_path = CASCADE_WHITE_CIRCLE;
-
 	m1.resize(2);
 	m2.resize(2);
 
@@ -36,10 +33,10 @@ AUV::AUV() {
 	model_points.push_back(cv::Point3d(-50, -50, 0)); // left down corner
 
 	//-- 1. Load the cascades
-	if (!marker_type_1.load(marker_1_path)) {
+	if (!marker_type_1.load(CASCADE_BLACK_CIRCLE)) {
 		cout << "--(!)Error loading first cascade\n";
 	}
-	else if (!marker_type_2.load(marker_2_path)) {
+	else if (!marker_type_2.load(CASCADE_WHITE_CIRCLE)) {
 		cout << "--(!)Error loading second cascade\n";
 	}
 	fout.open("E:/University/10sem/nirs/haar_3_4_6/haar_navigation/filtering_output.dat");
@@ -49,18 +46,14 @@ AUV::AUV() {
 	}
 }
 
+
 AUV ::~AUV() {
-	
 
 	fout.flush();
 	fout.close();
 }
 
 
-/*
-	Определяет наклон камеры по крену (ну почти)
-	в диапазоне от -90 до +90 градусов
-*/
 void AUV::rotate_over_normal(Mat& frame) {
 
 	static double delta_x = 0;
@@ -242,23 +235,6 @@ void AUV::calculate_deltas(Mat& frame, bool debug) {
 		this->line_equation(k1, b1, true);
 		this->line_equation(k2, b2, false);
 
-		//Eigen::Matrix2d A;
-		//Eigen::Vector2d B;
-		//Eigen::Vector2d X;
-
-		//A.row(0) << m1[0].x, 1;
-		//A.row(1) << m2[1].x, 1;
-
-		//B << m1[0].y, m2[1].y;
-
-		////cout << A << "\n\n";
-		////cout << B << "\n\n";
-
-		//X = A.lu().solve(B);
-
-		//k1 = X[0];
-		//b1 = X[1];
-
 		cout << k1 << " " << b1 << " " << m1[0].x << " " << m1[0].y << " ";
 		cout << m2[1].x << " " << m2[1].y << "\n";
 
@@ -409,10 +385,8 @@ void AUV::filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_g
 	return;
 }
 
-// Calculates rotation matrix to euler angles
-// The result is the same as MATLAB except the order
-// of the euler angles ( x and z are swapped ).
-Vec3f rotationMatrixToEulerAngles(Mat& R) {
+
+Vec3f AUV::rotationMatrixToEulerAngles(Mat& R) {
 
 	assert(isRotationMatrix(R));
 
@@ -436,6 +410,7 @@ Vec3f rotationMatrixToEulerAngles(Mat& R) {
 	return Vec3f(x, y, z);
 }
 
+
 void AUV::estimatePos(Mat &frame, bool draw_perp) {
 
 	if (this->m1.size() == 2 && this->m2.size() == 2) {
@@ -456,10 +431,10 @@ void AUV::estimatePos(Mat &frame, bool draw_perp) {
 		Mat rotMat(3, 3, CV_64F);
 		Rodrigues(this->Rvec, rotMat);
 
-		Vec3f Eul = rotationMatrixToEulerAngles(rotMat);
+		this->Euler_angles = rotationMatrixToEulerAngles(rotMat);
 		cout << setprecision(3);
-		cout << "In estimatePos: " << setw(7) << Eul[0] * 180 / 3.1415926 << setw(7) << Eul[1] * 180 / 3.1415926 << setw(7) << Eul[2] * 180 / 3.1415926 << "\n";
-		//cout  << Eul[1] * 180 / 3.1415926  << "\n";
+		//cout << "In estimatePos: " << setw(7) << Euler_angles[0] * 180 / M_PI << setw(7) << Euler_angles[1] * 180 / M_PI << setw(7) << Euler_angles[2] * 180 / M_PI << "\n";
+		//cout  << Euler_angles[1] * 180 / 3.1415926  << "\n";
 	
 		bool show_tvec = false;
 
@@ -487,6 +462,11 @@ void AUV::estimatePos(Mat &frame, bool draw_perp) {
 		cout << "Less than 4 markers\n";
 		cout << m1.size() << " "  << m2.size() << "\n";
 	}
+}
+
+
+double AUV::get_Euler_1() {
+	return Euler_angles[1] * 180 / M_PI;
 }
 
 
@@ -529,7 +509,7 @@ void AUV::get_orientation(Mat &frame) {
 	//AUV_sees = AUV_sees & frame_gray;
 
 	//imshow("AUV sees", AUV_sees);
-	imshow("our markers", our_markers);
+	//imshow("our markers", our_markers);
 
 	draw_objects(frame, m1, YEL);
 	draw_objects(frame, m2, PNK);
