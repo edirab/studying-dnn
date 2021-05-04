@@ -250,21 +250,21 @@ void AUV::calculate_deltas(Mat& frame, bool debug) {
 
 void AUV::filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_gray, markerType m_type, Mat AUV_sees, bool debug = false) {
 
+#define my_cout cout;
+//#define my_cout //
+
+	//RNG rng(12345);
+
 	vector<Marker> markers_;
 	vector<Marker> hough_valid;
+	Mat roi_mat_bin;
 	Mat roi_mat_gray;
+	Mat roi_canny;
 	Mat roi_mat_color;
+	Mat roi_contours;
 
 	sort(objects.begin(), objects.end(), compar);
 	//print_objects(objects);
-
-	if (m_type == markerType::black_circle) {
-		blobDetector_params.blobColor = 80;
-	}
-	else {
-		blobDetector_params.blobColor = 255;
-	}
-	this->blobDetector = SimpleBlobDetector::create(blobDetector_params);
 
 	if (debug) {
 		cout << "objects.size() = " << objects.size() << "\n";
@@ -280,85 +280,94 @@ void AUV::filter_objects_2(vector<Rect> objects, Mat& currentFrame, Mat& frame_g
 	// всё делается за один проход
 	for (int i = 0; i < objects.size(); i++) {
 
-		vector<Vec3f> circles;
-		roi_mat_gray = frame_gray(objects[i]);
 		roi_mat_color = currentFrame(objects[i]);
-		medianBlur(roi_mat_gray, roi_mat_gray, 5);
+		roi_mat_gray = frame_gray(objects[i]);
 
-		/*
-		Ищем все кружочки внутри одного ROI
-		*/
-		vector<KeyPoint> keypoints;
-		blobDetector->detect(roi_mat_gray, keypoints);
-		drawKeypoints(roi_mat_color, keypoints, roi_mat_color, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-		imshow("Key points", roi_mat_color);
-		waitKey(0);
+		blur(roi_mat_gray, roi_mat_gray, Size(3, 3));
+
+		threshold(roi_mat_gray, roi_mat_bin, 100, 255, THRESH_OTSU);
+		
+		//Canny(roi_mat_gray, roi_canny, 10, 250);
+		Canny(roi_mat_bin, roi_canny, 10, 250);
+
+		vector<vector<Point> > contours;
+		findContours(roi_canny, contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
+
+		//debug
+		roi_mat_color.copyTo(roi_contours);
+		//cout << "\nContours.size(): " << contours.size() << "\n";
+		for (size_t i = 0; i < contours.size(); i++) {
+			drawContours(roi_contours, contours, i, Scalar(0, 0, 255), 2);
+		}
+
+
+		vector<RotatedRect> minEllipse;
+
+		//cout << "\tROI area: " << objects[i].area() << " px^2\t" << "(" << objects[i].x << ", " << objects[i].y << ")\n";
+		for (size_t j = 0; j < contours.size(); j++)
+		{
+			int area = contourArea(contours[j]);
+			//cout << "\tContour #" << j << ": " << area << " px^2\n";
+
+			if (contours[j].size() > 15 && 
+				area < objects[i].area() * 0.50 && 
+				area > objects[i].area() * 0.15)
+			{
+				minEllipse.push_back(fitEllipse(contours[j]));
+			}
+		}
+
+		// Смещаем на координаты ROI
+		for (size_t k = 0; k < minEllipse.size(); k++) {
+
+			ellipse(roi_contours, minEllipse[k], Scalar(255, 0, 255), 2);
+
+			minEllipse[k].center.x += objects[i].x;
+			minEllipse[k].center.y += objects[i].y;
+
+			//cout << "\t\t" << "minEllipse: (" << minEllipse[i].center.x << ", " << minEllipse[i].center.y << ")\n";
+		}
+		
+		//imshow("Contours", roi_contours);
+		//imshow("Canny", roi_canny);
+		//imshow("Bin", roi_mat_bin);
+
+		// Отрисовка
+		for (size_t i = 0; i < minEllipse.size(); i++)
+		{
+			Scalar color;
+
+			if (m_type == markerType::black_circle) {
+				color = colors[2];
+			}
+			else {
+				color = colors[1];
+			}
+			ellipse(currentFrame, minEllipse[i], color, 3);
+			circle(currentFrame, minEllipse[i].center, 5, Scalar(0, 0, 255), 3);
+		}
+		//waitKey(0);
 
 		/*
 			Если каскад указал на объект и детектор Хаффа нашёл кружочек, то скорее всего, это то что нужно
 		*/
-		if (circles.size() == 1) {
+		if (minEllipse.size() > 0) {
 
-			Marker temp_m(objects[i].x + int(circles[0][0]), objects[i].y + int(circles[0][1]), m_type, objects[i]);
+			Marker temp_m(minEllipse[0].center.x, minEllipse[0].center.y, m_type, objects[i]);
 			hough_valid.push_back(temp_m);
 		}
 		/*
-		В одном roi_mat_gray кружочков больше одного. Что странно
-		Этот блок практически ничего не делает. За всё тестовое видео сработал 4 раза
+			В одном roi_mat_gray кружочков больше или меньше одного. Что странно
 		*/
-		else if (circles.size() > 1) {
+		else  {
 
-			Mat t;
-			if (m_type == markerType::black_circle) {
-				t = Marker::get_template_t1(roi_mat_gray.rows, roi_mat_gray.cols);
-				threshold(roi_mat_gray, roi_mat_gray, 200, 255, 0);
-				absdiff(roi_mat_gray, t, roi_mat_gray);
-				int nonZero = countNonZero(roi_mat_gray);
+			Point center;
+			center.x = objects[i].x + objects[i].width / 2;
+			center.y = objects[i].y + objects[i].height / 2;
 
-				//if (nonZero < 0.1 * frame_gray.cols) {
-				//	hough_valid.push_back(objects[i]);
-				//}
-			}
-			else {
-				t = Marker::get_template_t2(roi_mat_gray.rows, roi_mat_gray.cols);
-				threshold(roi_mat_gray, roi_mat_gray, 200, 255, 0);
-				absdiff(roi_mat_gray, t, roi_mat_gray);
-				int nonZero = countNonZero(roi_mat_gray);
-				//if (nonZero < 0.15 * frame_gray.cols) {
-				//	hough_valid.push_back(objects[i]);
-				//}
-			}
-		}
-		/*
-		Ситуация: каскад утверждает, что есть объект, но детектор Хаффа кружочка не нашёл
-		вот здесь и можно проверить маской
-		*/
-		else {
-			Mat t;
-			
-
-			if (m_type == markerType::black_circle) {
-				t = Marker::get_template_t1(roi_mat_gray.rows, roi_mat_gray.cols);
-				threshold(roi_mat_gray, roi_mat_gray, 60, 255, THRESH_BINARY);
-				//imshow("roi_mat_gray m1 thresholded", roi_mat_gray);
-
-				absdiff(roi_mat_gray, t, roi_mat_gray);
-				int nonZero = countNonZero(roi_mat_gray);
-				//cout << "m1 = " << setw(7) << nonZero << "\n";
-				//fout << "m1 = " << nonZero << "\n";
-			}
-			else {
-				t = Marker::get_template_t2(roi_mat_gray.rows, roi_mat_gray.cols);
-				threshold(roi_mat_gray, roi_mat_gray, 200, 255, THRESH_BINARY);
-				//imshow("roi_mat_gray m2 thresholded", roi_mat_gray);
-
-				absdiff(roi_mat_gray, t, roi_mat_gray);
-				int nonZero = countNonZero(roi_mat_gray);
-				//cout << "m2 = " << setw(7) << nonZero << "\n";
-				//fout << "m2 = " << nonZero << "\n";
-			}
-		}
-		// конец проверки маской
+			Marker temp_m(center.x, center.y, m_type, objects[i]);
+			hough_valid.push_back(temp_m);
+		} // конец дополнительной обработки
 	}
 
 	/*

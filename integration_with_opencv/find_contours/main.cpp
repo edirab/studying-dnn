@@ -54,16 +54,11 @@ void design_new_algo(Mat &frame) {
 		vector<vector<Point> > contours;
 		findContours(canny_output(roi), contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
 
-		vector<RotatedRect> minRect(contours.size());
 		vector<RotatedRect> minEllipse(contours.size());
 
 		for (size_t i = 0; i < contours.size(); i++)
 		{
-			minRect[i] = minAreaRect(contours[i]);
-			minRect[i].center.x += roi.x;
-			minRect[i].center.y += roi.y;
-
-			if (contours[i].size() > 5)
+			if (contours[i].size() > 15)
 			{
 				minEllipse[i] = fitEllipse(contours[i]);
 				minEllipse[i].center.x += roi.x;
@@ -73,28 +68,20 @@ void design_new_algo(Mat &frame) {
 
 		for (size_t i = 0; i < contours.size(); i++)
 		{
-			Scalar color = Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
-			// contour
-			//drawContours(frame, contours, (int)i, color);
-			// ellipse
-			ellipse(frame, minEllipse[i], color, 3);
-			// rotated rectangle
-			Point2f rect_points[4];
-			minRect[i].points(rect_points);
-			for (int j = 0; j < 4; j++)
-			{
-				line(frame, rect_points[j], rect_points[(j + 1) % 4], color);
+			int area = contourArea(contours[i]);
+
+			if (area < roi.area() * 0.65 && area > roi.area() * 0.2) {
+				Scalar color = Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
+				ellipse(frame, minEllipse[i], color, 3);
+				circle(frame, minEllipse[i].center, 5, Scalar(0, 0, 255), 3);
 			}
 		}
-
 	}
 
 
 	for (Rect r : rois) {
 		rectangle(frame, r, Scalar(255, 0, 0), 3);
 	}
-
-
 
 	resize(frame, frame, Size(), 0.7, 0.7);
 	resize(canny_output, canny_output, Size(), 0.5, 0.5);
@@ -103,6 +90,7 @@ void design_new_algo(Mat &frame) {
 	imshow("Canny", canny_output);
 	waitKey(0);
 }
+
 
 int main(int argc, char** argv)
 {
