@@ -77,6 +77,12 @@ Vec3f rotationMatrixToEulerAngles(Mat& R) {
 
 int do_alalysis(string vid) {
 
+	vector<int> times_vec;
+	times_vec.reserve(150);
+
+	auto t1 = std::chrono::high_resolution_clock::now();
+	auto t2 = std::chrono::high_resolution_clock::now();
+
 	vector<Vec3d> rvecs, tvecs;
 	Vec3f Eul;
 	vector<int> ids;
@@ -106,11 +112,15 @@ int do_alalysis(string vid) {
 		}
 		frame.copyTo(frame_copy);
 
+		t1 = std::chrono::high_resolution_clock::now();
 		cv::aruco::detectMarkers(frame, dictionary, corners, ids);
+		t2 = std::chrono::high_resolution_clock::now();
 		cv::aruco::drawDetectedMarkers(frame_copy, corners, ids);
 		cv::aruco::estimatePoseSingleMarkers(corners, 29, cMatrixFullHD, distortionFullHD, rvecs, tvecs);
 
+		int duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 		//cout << rvecs << "\n";
+		times_vec.push_back(duration);
 
 		if (rvecs.size() > 0 && tvecs.size() > 0) {
 			Rodrigues(rvecs[0], rotMat);
@@ -135,8 +145,12 @@ int do_alalysis(string vid) {
 		if (waitKey(1) == 27)
 			break;
 	}
+
+	double times_sum = 0;
+	for (int elem : times_vec) times_sum += elem;
+
 	capture.release();
-	cout << "\n  Real angle: " << real_angle << "\n";
+	cout << "\n  Real angle: " << real_angle << " Avg detection time: " << (double)times_sum /times_vec.size() << "\n";
 	real_angle += 5;
 	myStats.print_stats(path);
 }

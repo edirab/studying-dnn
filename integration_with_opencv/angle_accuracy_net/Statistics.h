@@ -4,6 +4,7 @@
 #include <math.h>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <iomanip>
 #include <algorithm>
@@ -12,23 +13,18 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::setw;
+using std::ofstream;
 
 class Statistics
 {
 
 public:
 	Statistics();
+	~Statistics();
 
 	void print_stats(string path);
 
-	inline void add(double val) {
-
-		values.push_back(val);
-
-		if (val >= 0) {
-			values_non_negative.push_back(val);
-		}
-	}
+	void add(double val);
 
 	double get_median();
 	double get_average();
@@ -39,6 +35,8 @@ public:
 	double get_std_filtered();
 
 private:
+	ofstream out_file;
+
 	vector <double> values;
 	vector <double> values_non_negative;
 

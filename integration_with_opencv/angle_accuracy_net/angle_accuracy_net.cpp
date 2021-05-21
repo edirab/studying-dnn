@@ -16,7 +16,7 @@
 
 //#define VIDEO_PATH "E:/University/10sem/nirs/haar_3_4_6/pyramid_test.mp4"
 #define VIDEO_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/75.mp4"
-#define VIDEO_BASE_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/"
+#define VIDEO_BASE_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/for_yolo_and_cascade/"
 
 using namespace std;
 using namespace cv;
@@ -73,9 +73,10 @@ int main(int argc, const char** argv) {
 	system("chcp 1251");
 
 	auto t1 = high_resolution_clock::now();
-	for (string single_video : videos) {
-		do_alalysis(single_video);
-	}
+	//for (string single_video : videos) {
+	//	do_alalysis(single_video);
+	//}
+	do_alalysis("30.mp4");
 	auto t2 = high_resolution_clock::now();
 
 	cout << "Total time in seconds: " << duration_cast<seconds>(t2 - t1).count() << "\n";
