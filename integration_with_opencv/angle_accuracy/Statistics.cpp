@@ -6,8 +6,27 @@ Statistics::Statistics() {
 	// 5 seconds of video * framerate
 	values.reserve(5 * 30);
 	values_non_negative.reserve(5 * 30);
+
+	out_file.open("C:/aruco.txt");
 }
 
+Statistics::~Statistics() {
+
+	if (out_file.is_open())
+		out_file.close();
+
+}
+
+void Statistics::add(double val) {
+
+	values.push_back(val);
+
+	if (val >= 0) {
+		values_non_negative.push_back(val);
+	}
+
+	if (out_file.is_open()) out_file << std::to_string(val) << "\n";
+}
 
 double Statistics::get_median() {
 
