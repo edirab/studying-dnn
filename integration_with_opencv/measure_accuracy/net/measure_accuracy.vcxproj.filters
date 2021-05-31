@@ -11,4 +11,7 @@
       <UniqueIdentifier>{1c475c4e-ad24-4a02-a766-2655132b5d7a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Experiment.h" />
+  </ItemGroup>
 </Project>

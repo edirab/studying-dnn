@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <clocale>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -14,6 +15,8 @@ using std::cout;
 using std::setw;
 
 int frame_counter = 0;
+
+std::string file_path = VIDEO_W_CIRCLE;
 
 /*
 	Маркер: 
@@ -32,9 +35,10 @@ cv::Mat frame_resized;
 
 int main()
 {
+	std::setlocale(0, "");
 	Experiment myExp;
 
-	cv::VideoCapture source(VIDEO_W_CIRCLE);
+	cv::VideoCapture source(file_path);
 	//cv::VideoCapture source(0);
 	
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -101,7 +105,7 @@ int main()
 	} // end while(1)
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-	cout << "Total frames: " << frame_counter << "\n";
+	cout << "Total frames: " << frame_counter << " in " << file_path << "\n";
 
 	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
@@ -110,24 +114,25 @@ int main()
 	/*
 		Выводим индексы для красоты и наглядности
 	*/
-	cout << "objs: ";
+	cout << "objs: [";
 	for (int i = 0; i < MAX_OBJECTS; i++)
-		cout << setw(4) << i;
-	cout << "\n";
+		cout << setw(4) << i << ",";
+	cout << " ]\n";
 
-	cout << "dock: ";
+	cout << "dock: [";
 	for (int elem : marker_stats[0])
-		cout << setw(4) << elem;
-	cout << "\n";
+		cout << setw(4) << elem << ",";
+	cout << " ]\n";
 
-	cout << "w.c.: ";
+	cout << "w.c.: [";
 	for (int elem : marker_stats[1])
-		cout << setw(4) << elem;
-	cout << "\n";
+		cout << setw(4) << elem << ",";
+	cout << " ]\n";
 
-	cout << "b.c.: ";
+	cout << "b.c.: [";
 	for (int elem : marker_stats[2])
-		cout << setw(4) << elem;
+		cout << setw(4) << elem << ",";
+	cout << " ]\n";
 
 	return 0;
 }

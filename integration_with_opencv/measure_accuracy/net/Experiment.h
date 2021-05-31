@@ -28,6 +28,14 @@
 #define VIDEO_W_CIRCLE "D:/studying-dnn/integration_with_opencv/measure_accuracy/white_circle.mp4"
 #define VIDEO_B_CIRCLE "D:/studying-dnn/integration_with_opencv/measure_accuracy/black_circle.mp4"
 
+/*
+	Иследование точности, часть 2. Новые видео с ограниченными углами:
+	- white_circle_1.mp4 OR white_circle_2.mp4,
+	- black_circle_1.mp4 OR black_circle_2.mp4"
+*/
+#define VIDEO_W_CIRCLE "E:/University/12sem/ВКРМ/Исследование/Точность детектирования/research_2/white_circle_1.mp4"
+#define VIDEO_B_CIRCLE "E:/University/12sem/ВКРМ/Исследование/Точность детектирования/research_2/black_circle_1.mp4"
+
 constexpr float CONFIDENCE_THRESHOLD = 0.8;
 constexpr float NMS_THRESHOLD = 0.05;
 constexpr int NUM_CLASSES = 3;

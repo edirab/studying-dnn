@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <clocale>
 
 #include <opencv2/core.hpp>
 #include "opencv2/objdetect.hpp"
@@ -45,9 +46,18 @@ cv::Mat frame, frame_gray, frame_resized;
 #define VIDEO_W_CIRCLE "D:/studying-dnn/integration_with_opencv/measure_accuracy/white_circle.mp4"
 #define VIDEO_B_CIRCLE "D:/studying-dnn/integration_with_opencv/measure_accuracy/black_circle.mp4"
 
+/* 
+	Иследование точности, часть 2. Новые видео с ограниченными углами: 
+	- white_circle_1.mp4 OR white_circle_2.mp4, 
+	- black_circle_1.mp4 OR black_circle_2.mp4"
+*/
+#define VIDEO_W_CIRCLE "E:/University/12sem/ВКРМ/Исследование/Точность детектирования/research_2/white_circle_1.mp4"
+#define VIDEO_B_CIRCLE "E:/University/12sem/ВКРМ/Исследование/Точность детектирования/research_2/black_circle_2.mp4"
+
 #define bc_cascade_path "E:/University/10sem/nirs/haar_3_4_6/preparing navigation/haar_navigation_m1_v3/cascade.xml"
 #define wc_cascade_path "E:/University/10sem/nirs/haar_3_4_6/preparing navigation/haar_navigation_m2_v1/cascade.xml"
 
+std::string file_path = VIDEO_B_CIRCLE;
 
 /*
 	Отобразить объекты из вектора на изображении
@@ -62,7 +72,7 @@ void draw_objects(Mat& frame, vector<Rect> objects, cv::Scalar color) {
 
 int main()
 {
-
+	std::setlocale(0, "");
 	cv::CascadeClassifier marker_bc_cascade, marker_wc_cascade;
 
 	//-- 1. Load the cascades
@@ -74,7 +84,7 @@ int main()
 	}
 
 
-	cv::VideoCapture source(VIDEO_W_CIRCLE);
+	cv::VideoCapture source(file_path);
 	//cv::VideoCapture source(0);
 
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -135,7 +145,7 @@ int main()
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-	cout << "Total frames: " << frame_counter << "\n";
+	cout << "Total frames: " << frame_counter << " in " << file_path << "\n";
 
 	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 	std::cout << "\tTime difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
@@ -145,20 +155,20 @@ int main()
 		Выводим индексы для красоты и наглядности
 	
 	*/
-	cout << "objs: ";
+	cout << "objs: [";
 	for (int i = 0; i < MAX_OBJECTS; i++)
-		cout << setw(4) << i;
-	cout << "\n";
+		cout << setw(4) << i << ",";
+	cout << " ]\n";
 
-	cout << "w.c.: ";
+	cout << "w.c.: [";
 	for (int elem : marker_stats[0])
-		cout << setw(4) << elem;
-	cout << "\n";
+		cout << setw(4) << elem << ",";
+	cout << " ]\n";
 
-	cout << "b.c.: ";
+	cout << "b.c.: [";
 	for (int elem : marker_stats[1])
-		cout << setw(4) << elem;
-
+		cout << setw(4) << elem << ",";
+	cout << " ]\n";
 	//for (int i = 0; i < 2; i++) {
 	//	for (int elem : marker_stats[i])
 	//		cout << elem << " ";
