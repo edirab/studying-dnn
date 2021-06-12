@@ -137,16 +137,16 @@ void Statistics::print_stats(string path) {
 	cout << std::setprecision(4);
 
 	cout << setw(w1) << "Len values: "          << setw(w2) << values.size() << "\n";
-	cout << setw(w1) << "Len values filtered: " << setw(w2) << values_non_negative.size() << "\n";
+	//cout << setw(w1) << "Len values filtered: " << setw(w2) << values_non_negative.size() << "\n";
 
 	cout << setw(w1) << "Average: "           << setw(w2) << get_average() << "\n";
-	cout << setw(w1) << "Average filtered: "  << setw(w2) << get_average_filtered() << "\n";
+	//cout << setw(w1) << "Average filtered: "  << setw(w2) << get_average_filtered() << "\n";
 
 	cout << setw(w1) << "Median: "          << setw(w2) << get_median() << "\n";
-	cout << setw(w1) << "Median filtered: " << setw(w2) << get_median_filtered() << "\n";
+	//cout << setw(w1) << "Median filtered: " << setw(w2) << get_median_filtered() << "\n";
 
 	cout << setw(w1) << "Std dev: "          << setw(w2) << get_std_dev() << "\n";
-	cout << setw(w1) << "Std dev filtered: " << setw(w2) << get_std_filtered() << "\n";
+	//cout << setw(w1) << "Std dev filtered: " << setw(w2) << get_std_filtered() << "\n";
 
 	return;
 }

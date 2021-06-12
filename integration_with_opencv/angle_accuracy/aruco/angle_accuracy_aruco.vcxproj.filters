@@ -18,12 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\angle_accuracy_net\Statistics.cpp">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="..\Statistics.cpp">
+      <Filter>Файлы ресурсов</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\angle_accuracy_net\Statistics.h">
+    <ClInclude Include="..\Statistics.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

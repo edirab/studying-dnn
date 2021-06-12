@@ -13,9 +13,9 @@
 #include <vector>
 #include <chrono>
 
-#include "../angle_accuracy_net/Statistics.h"
+#include "../Statistics.h"
 
-#define VIDEO_BASE_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/"
+#define VIDEO_BASE_PATH "E:/University/12sem/ВКРМ/Исследование/Точность угла/angle/all_in_one_2/"
 
 using namespace std;
 using namespace std::chrono;
@@ -23,13 +23,14 @@ using namespace cv;
 
 int real_angle = 0;
 
-Mat cMatrixFullHD = (Mat_<double>(3, 3) << 1.8319233710098095e+04, 0, 9.5950000000000000e+02,
-	0, 1.8319233710098095e+04, 5.3950000000000000e+02,
+Mat cMatrixFullHD = (Mat_<double>(3, 3) << 1.8319186447786888e+04, 0, 9.5950000000000000e+02,
+	0, 1.8319186447786888e+04, 5.3950000000000000e+02,
 	0, 0, 1);
 
-Mat distortionFullHD = (Mat_<double>(1, 5) << 2.5318626977076864e+01, -1.2398369018684898e+04, 0, 0, 2.4953338626272022e+06);
+Mat distortionFullHD = (Mat_<double>(1, 5) << 2.5318391279962491e+01, -1.2398130862604572e+04, 0, 0, 2.4952587093051355e+06);
 
-vector<string> videos = { "90.mp4", "85.mp4", "80.mp4", "75.mp4", "70.mp4", "65.mp4", "60.mp4", "55.mp4", "50.mp4", "45.mp4", "40.mp4", "35.mp4", "30.mp4" };
+//vector<string> videos = { "90.mp4", "85.mp4", "80.mp4", "75.mp4", "70.mp4", "65.mp4", "60.mp4", "55.mp4", "50.mp4", "45.mp4", "40.mp4", "35.mp4", "30.mp4" };
+vector<string> videos = { "90.mp4", "85.mp4", "80.mp4", "75.mp4" };
 
 Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::DICT_ARUCO_ORIGINAL);
 

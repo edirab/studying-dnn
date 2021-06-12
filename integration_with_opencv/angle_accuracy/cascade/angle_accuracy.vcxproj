@@ -233,18 +233,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Statistics.cpp" />
     <ClCompile Include="AUV.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Marker.cpp" />
-    <ClCompile Include="Statistics.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Statistics.h" />
     <ClInclude Include="AUV.h" />
     <ClInclude Include="FPS.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="Marker.h" />
-    <ClInclude Include="Statistics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

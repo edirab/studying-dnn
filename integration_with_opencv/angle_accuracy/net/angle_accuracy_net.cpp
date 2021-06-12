@@ -8,15 +8,16 @@
 #include "Marker.h"
 #include "AUV.h"
 #include "functions.h"
-#include "Statistics.h"
+#include "../Statistics.h"
 
 #include "opencv2/objdetect.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
 //#define VIDEO_PATH "E:/University/10sem/nirs/haar_3_4_6/pyramid_test.mp4"
-#define VIDEO_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/75.mp4"
-#define VIDEO_BASE_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/for_yolo_and_cascade/"
+//#define VIDEO_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/75.mp4"
+//#define VIDEO_BASE_PATH "E:/University/12sem/ВКРМ/Нейронки/angle/for_yolo_and_cascade/"
+#define VIDEO_BASE_PATH "E:/University/12sem/ВКРМ/Исследование/Точность угла/angle/all_in_one_2/"
 
 using namespace std;
 using namespace cv;
@@ -26,8 +27,8 @@ int real_angle = 0;
 AUV auv;
 VideoCapture capture;
 
-vector<string> videos = { "90.mp4", "85.mp4", "80.mp4", "75.mp4", "70.mp4", "65.mp4", "60.mp4", "55.mp4", "50.mp4", "45.mp4", "40.mp4", "35.mp4", "30.mp4" };
-
+//vector<string> videos = { "90.mp4", "85.mp4", "80.mp4", "75.mp4", "70.mp4", "65.mp4", "60.mp4", "55.mp4", "50.mp4", "45.mp4", "40.mp4", "35.mp4", "30.mp4" };
+vector<string> videos = { "90.mp4", "85.mp4", "80.mp4", "75.mp4" };
 
 int do_alalysis(string vid) {
 
@@ -73,10 +74,10 @@ int main(int argc, const char** argv) {
 	system("chcp 1251");
 
 	auto t1 = high_resolution_clock::now();
-	//for (string single_video : videos) {
-	//	do_alalysis(single_video);
-	//}
-	do_alalysis("30.mp4");
+	for (string single_video : videos) {
+		do_alalysis(single_video);
+	}
+	//do_alalysis("30.mp4");
 	auto t2 = high_resolution_clock::now();
 
 	cout << "Total time in seconds: " << duration_cast<seconds>(t2 - t1).count() << "\n";
