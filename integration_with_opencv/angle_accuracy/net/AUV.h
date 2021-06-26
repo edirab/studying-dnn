@@ -40,7 +40,7 @@ using namespace cv;
 //using namespace aruco;
 using namespace std;
 
-constexpr float CONFIDENCE_THRESHOLD = 0.8;
+constexpr float CONFIDENCE_THRESHOLD = 0.6;
 constexpr float NMS_THRESHOLD = 0.05;
 constexpr int NUM_CLASSES = 3;
 

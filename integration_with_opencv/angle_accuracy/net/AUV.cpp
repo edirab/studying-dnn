@@ -480,7 +480,7 @@ void AUV::estimatePos(Mat &frame, bool draw_perp) {
 				perpendicular_point3D.push_back(Point3d(0, 0, 0));
 				perpendicular_point3D.push_back(Point3d(0, 0, 100));
 
-			projectPoints(perpendicular_point3D, Rvec, Tvec, cMatrix640, distortion640, perpendicular_point2D);
+			projectPoints(perpendicular_point3D, this->Rvec, this->Tvec, cMatrixFullHD, distortionFullHD, perpendicular_point2D);
 			line(frame, perpendicular_point2D[0], perpendicular_point2D[1], cv::Scalar(255, 0, 0), 2);
 		}
 	}
@@ -527,11 +527,12 @@ void AUV::get_orientation(Mat &frame) {
 	Mat our_markers = Mat::zeros(frame.size(), CV_8UC1);
 
 	this->rotate_over_normal(frame);
-	this->arrange_markers(our_markers, true);
-	this->calculate_distance(frame, false);
+	//this->arrange_markers(our_markers, true);
+	this->arrange_markers(frame, true);
+	//this->calculate_distance(frame, false);
 	////this->calculate_deltas(frame, true);
 
-	this->estimatePos(frame, false);
+	this->estimatePos(frame, true);
 
 	AUV_sees = Mat::zeros(frame.size(), CV_8UC1);
 

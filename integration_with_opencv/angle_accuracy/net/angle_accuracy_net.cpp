@@ -55,6 +55,7 @@ int do_alalysis(string vid) {
 		//cerr << setprecision(3) << auv.get_Euler_1() << "\n";
 
 		resize(frame, frame, Size(), 0.5, 0.5, cv::INTER_LINEAR);
+		cv::putText(frame, std::to_string(auv.get_Euler_1()), cv::Point(20, 80), 0, 0.4, cv::Scalar(0, 0, 255), 1);
 		imshow("Orientation", frame);
 
 		if (waitKey(1) == 27)
